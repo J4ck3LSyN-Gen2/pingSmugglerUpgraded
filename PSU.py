@@ -386,7 +386,7 @@ class pingSmugglerUpgraded:
         self.subParConnect.add_argument("rHost",help="The tunnel server (listening) host.")
         self.subParConnect.add_argument("lPort",type=int,help="The local port to listen on.")
         self.subParConnect.add_argument("rPort",type=int,help="The remote port on the target host.")
-        self.subParGenKey = self.subParCenteral.add_parser("generate-key",help="Generate an AES key.")
+        self.subParGenKey = self.subParCenteral.add_parser("key-gen",help="Generate an AES key.")
         self.subParGenKey.add_argument("-s","--size",type=int,default=16,choices=[16,24,32],help="Key size in bytes (16, 24, or 32).")
         self.args = self.centralParser.parse_args()
         return True
@@ -447,8 +447,12 @@ class pingSmugglerUpgraded:
             if len(args.key) not in [16, 24, 32]:
                 self.customLogPipe("Error: Invalid key size. Key must be 16, 24, or 32 bytes long for AES.", level=3);sys.exit(1)
             client = self.tunnelClient(self, args.key.encode('utf-8'), args.rHost, args.rPort, args.lPort);client.start()
-        elif args.mode == 'generate-key':
-            key = os.urandom(args.size);self.customLogPipe(f"Generated {args.size}-byte AES key: {key.hex()}", level='output', noLog=True)
+        elif args.mode == 'key-gen':
+            key = os.urandom(args.size)
+            self.customLogPipe(f"Generated {args.size}-byte AES key: {key.hex()}", level='output')
+            print(f"- AES-KEY({str(args.size)}): `{str(key.hex())}`")
+            sys.exit(0)
+
 
 
 def raiseBanner():
@@ -466,7 +470,7 @@ def raiseBanner():
         '             └─PASS─┘              ╚╝ ', 
         '======================================',
         f"{colorama.Fore.CYAN}Author: {colorama.Fore.LIGHTYELLOW_EX}J4ck3LSyN{colorama.Fore.RESET}",
-        f"{colorama.Fore.CYAN}Credid: {colorama.Fore.LIGHTYELLOW_EX}0x7sec{colorama.Fore.RESET}",
+        f"{colorama.Fore.CYAN}Credit: {colorama.Fore.LIGHTYELLOW_EX}0x7sec{colorama.Fore.RESET}",
         "======================================"
     ];banner = "\n".join(banner)
     for i in [
