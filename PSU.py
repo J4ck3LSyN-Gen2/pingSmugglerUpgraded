@@ -465,9 +465,9 @@ def raiseBanner():
         '╚═══╝     │ ╔[TUNNEL]╗ │     ╚═══╝O║ ', 
         '          ├╱║░▒▒▒▒▒░║╲├           O║ ', 
         '       >>─╬─║▓CRYPT▓║─╬─>>        T║ ', 
-        '          ╲ ║░▒▒▒▒▒░║ ╱            ◈║ ', 
-        '           ╲╚═[SEC]═╝╱             ▓║ ', 
-        '             └─PASS─┘              ╚╝ ', 
+        '          ╲ ║░▒▒▒▒▒░║ ╱           ≛║ ', 
+        '           ╲╚═[SEC]═╝╱            ▓║ ', 
+        '             └─PASS─┘             ╚╝ ', 
         '======================================',
         f"{colorama.Fore.CYAN}Author: {colorama.Fore.LIGHTYELLOW_EX}J4ck3LSyN{colorama.Fore.RESET}",
         f"{colorama.Fore.CYAN}Credit: {colorama.Fore.LIGHTYELLOW_EX}0x7sec{colorama.Fore.RESET}",
@@ -492,3 +492,4 @@ if __name__ == "__main__":
     raiseBanner()
     psu = pingSmugglerUpgraded(app=True)
     psu.run()
+
