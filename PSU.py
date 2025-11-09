@@ -2,7 +2,9 @@
 import argparse, os, sys, base64
 import time, random, socket, threading
 import struct, logging, traceback, getpass
+import colorama  # type: ignore
 class psuLoggingFormatter(logging.Formatter):
+    # "\x1b[1m"+"\x1b[38m"
     black = "\x1b[30m";red = "\x1b[31m";green = "\x1b[32m";yellow = "\x1b[33m"
     blue = "\x1b[34m";gray = "\x1b[38m";reset = "\x1b[0m";bold = "\x1b[1m"
     COLORS = {logging.DEBUG: gray+bold,logging.INFO: blue+bold,logging.WARNING: yellow+bold,logging.ERROR: red,logging.CRITICAL: red+bold,}
@@ -447,6 +449,42 @@ class pingSmugglerUpgraded:
             client = self.tunnelClient(self, args.key.encode('utf-8'), args.rHost, args.rPort, args.lPort);client.start()
         elif args.mode == 'generate-key':
             key = os.urandom(args.size);self.customLogPipe(f"Generated {args.size}-byte AES key: {key.hex()}", level='output', noLog=True)
+
+
+def raiseBanner():
+    
+    banner = [
+        '*-- PSU (Ping Smuggler Upgraded ) --*', 
+        '=====================================', 
+        '╔SRC╗                        ╔DST╗═╗ ', 
+        '║▓▓▓║─AES─┐            ┌─AES─║▓▓▓║R║ ', 
+        '╚═══╝     │ ╔[TUNNEL]╗ │     ╚═══╝O║ ', 
+        '          ├╱║░▒▒▒▒▒░║╲├           O║ ', 
+        '       >>─╬─║▓CRYPT▓║─╬─>>        T║ ', 
+        '          ╲ ║░▒▒▒▒▒░║ ╱            ◈║ ', 
+        '           ╲╚═[SEC]═╝╱             ▓║ ', 
+        '             └─PASS─┘              ╚╝ ', 
+        '======================================',
+        f"{colorama.Fore.CYAN}Author: {colorama.Fore.LIGHTYELLOW_EX}J4ck3LSyN{colorama.Fore.RESET}",
+        f"{colorama.Fore.CYAN}Credid: {colorama.Fore.LIGHTYELLOW_EX}0x7sec{colorama.Fore.RESET}",
+        "======================================"
+    ];banner = "\n".join(banner)
+    for i in [
+        "AES", "TUNNEL", "CRYPT",
+        "SEC","PASS","DST","SRC"]:
+        banner = banner.replace(i,f"{colorama.Fore.RED}{i}{colorama.Fore.RESET}")
+
+    for i in ["R║","O║","T║"]:
+        banner = banner.replace(i,f"{colorama.Fore.LIGHTMAGENTA_EX}{i[0]}{colorama.Fore.RESET}║")
+    
+    for i in ['▒','░']: banner = banner.replace(i,f"{colorama.Style.DIM}{colorama.Fore.BLUE}{i}{colorama.Style.RESET_ALL}")
+
+    for i in ['▓','▓']: banner = banner.replace(i,f"{colorama.Style.DIM}{colorama.Fore.MAGENTA}{i}{colorama.Style.RESET_ALL}")
+    
+    print(str(banner))
+
 if __name__ == "__main__":
+    colorama.init()
+    raiseBanner()
     psu = pingSmugglerUpgraded(app=True)
     psu.run()
