@@ -106,7 +106,7 @@ The central modules for this project is `scapy`, `cryptography` & `colorama`.
 Alternativly you can directly install the modules via:
 
 ```markdown
-python3 -m pip install scapy cryprography
+python3 -m pip install scapy cryprography colorama
 ```
 
 ## Usage
@@ -397,4 +397,5 @@ deactivate
 ## Discliamer
 
 > (**DISCLAIMER**) This tool is provided for authorized testing and educational purposes only. Unauthorized network access and data exfiltration are illegal. Users are responsible for ensuring they have proper authorization before using this tool on any network.
+
 
