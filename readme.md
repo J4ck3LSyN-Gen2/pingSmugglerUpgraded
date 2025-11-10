@@ -5,6 +5,8 @@
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![Code Style](https://img.shields.io/badge/code%20style-PEP8-yellow)
 
+![PSU Help Screen](imgs/header.png)
+
 ## About
 
 `PSU` is a tool originally developed by `0x7sec` (https://github.com/0x7sec) as a way to exfiltrate data from a private network via sending encrypted payloads disguised as ICMP ping packets. This rewrite extends the concept with enhanced `send` and `recv` functionality, support for bidirectional TCP tunneling over ICMP, and improved encryption standards.
@@ -84,6 +86,14 @@ source PSUEnviron/bin/activate.fish
 ```
 
 ### Module Installation
+
+#### Linux Package Install (scapy)
+
+```sh
+sudo apt install python3-scapy
+```
+
+### Requirements.txt
 
 ```markdown
 python3 -m pip install -r requirements.txt
