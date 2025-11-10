@@ -31,41 +31,14 @@ class pingSmugglerUpgraded:
         logFunc = logMap.get(level, self.customLogger.info)
         if not noLog: logFunc(f"{prefix}{message}", exc_info=exc_info)
     def __init__(self,noConfirmUser:bool=False,app:bool=False):
-        self.config = {"noConfirmUser":noConfirmUser}
-        self.history = {}
-        self.customLogger = customLogger
-        self.customLogPipe("Initializing PSU...")
-        self.customLogPipe("Attempting `scapy` & `cryptography` import...")
-        self._initImports()
-        self.app = app
-        self.centralParser = None
-        self.subParCenteral = None
-        self.subParSend = None
-        self.subParRecv = None
-        self.subParConnect = None
-        self.subParListen = None
-        self.subParGenKey = None
-        self.args = None
-        self.FLAG_SYN = 0x01
-        self.FLAG_FIN = 0x02
-        self.FLAG_DATA = 0x04
-        self.CONN_ID_MAX = 65535
-        self.HEADER_FORMAT = "!HB"
-        self.HEADER_SIZE = struct.calcsize(self.HEADER_FORMAT)
+        self.config = {"noConfirmUser":noConfirmUser};self.history = {};self.customLogger = customLogger;self.customLogPipe("Initializing PSU...");self.customLogPipe("Attempting `scapy` & `cryptography` import...");self._initImports();self.app = app
+        self.centralParser = None;self.subParCenteral = None;self.subParSend = None;self.subParRecv = None;self.subParConnect = None;self.subParListen = None;self.subParGenKey = None
+        self.args = None;self.FLAG_SYN = 0x01;self.FLAG_FIN = 0x02;self.FLAG_DATA = 0x04;self.CONN_ID_MAX = 65535;self.HEADER_FORMAT = "!HB";self.HEADER_SIZE = struct.calcsize(self.HEADER_FORMAT)
         if self.app: self.parsersInitialized = self._initParsers()
         else: self.parsersInitialized = False
     class tunnelClient:
         def __init__(self,PSUI:callable,key:str,rHost:str,rPort:int,lPort:int,connID:int=None):
-            self.psu = PSUI
-            self.key = key
-            self.rHost = rHost
-            self.rPort = rPort
-            self.lPort = lPort
-            self.sessions = {}
-            self.history = {}
-            self.connIDCounter = random.randint(1,1024)
-            self.lock = threading.Lock()
-            self.running = False
+            self.psu = PSUI;self.key = key;self.rHost = rHost;self.rPort = rPort;self.lPort = lPort;self.sessions = {};self.history = {};self.connIDCounter = random.randint(1,1024);self.lock = threading.Lock();self.running = False
             self.psu.customLogPipe(f"Initialized `tunnelClient` module, rHost: '{self.rHost}:{self.rPort}', Local port: '{self.lPort}' / '{str(self.key)[:5]}...'.")
         def _encryptPayload(self,data):
             iv = os.urandom(16)
@@ -83,10 +56,7 @@ class pingSmugglerUpgraded:
                 self.psu.customLogPipe(f"Caught exception while attempting to decrypt a payload: '{str(E)}'.",level=3)
                 return None
         def _listenLocal(self):
-            localServer = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-            localServer.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            localServer.bind(('127.0.0.1',self.lPort))
-            localServer.listen(5)
+            localServer = socket.socket(socket.AF_INET,socket.SOCK_STREAM);localServer.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1);localServer.bind(('127.0.0.1',self.lPort));localServer.listen(5)
             self.psu.customLogPipe(f"Local listener started on port {self.lPort}.")
             try:
                 while self.running:
@@ -114,10 +84,7 @@ class pingSmugglerUpgraded:
                 while self.running:
                     data = clientSock.recv(4096)
                     if not data: break
-                    encPacket = self._encryptPayload(struct.pack(self.psu.HEADER_FORMAT, connID, self.psu.FLAG_DATA) + data)
-                    packet = scapyIP(dst=self.rHost) / scapyICMP() / encPacket
-                    scapySend(packet, verbose=False)
-                    self.psu.customLogPipe(f"Sent DATA packet for connection {connID}.")
+                    encPacket = self._encryptPayload(struct.pack(self.psu.HEADER_FORMAT, connID, self.psu.FLAG_DATA) + data);packet = scapyIP(dst=self.rHost) / scapyICMP() / encPacket;scapySend(packet, verbose=False);self.psu.customLogPipe(f"Sent DATA packet for connection {connID}.")
             except Exception as E:
                 self.psu.customLogPipe(f"Error handling client for connection {connID}: '{str(E)}'.",level=3)
             finally:
@@ -149,12 +116,7 @@ class pingSmugglerUpgraded:
                 except: pass
             scapySniff(filter='icmp', prn=processICMPResponse, store=0)
         def start(self):
-            self.running = True
-            self.psu.customLogPipe("Starting tunnel client...")
-            listenerThread = threading.Thread(target=self._listenLocal, daemon=True)
-            icmpThread = threading.Thread(target=self._listenICMP, daemon=True)
-            listenerThread.start()
-            icmpThread.start()
+            self.running = True;self.psu.customLogPipe("Starting tunnel client...");listenerThread = threading.Thread(target=self._listenLocal, daemon=True);icmpThread = threading.Thread(target=self._listenICMP, daemon=True);listenerThread.start();icmpThread.start()
             try:
                 listenerThread.join()
             except KeyboardInterrupt:
@@ -162,13 +124,7 @@ class pingSmugglerUpgraded:
                 self.running = False
     class tunnelServe:
         def __init__(self,PSUI:callable,key:str,rHost:str,rPort:int):
-            self.psu = PSUI
-            self.key = key
-            self.rHost = rHost
-            self.rPort = rPort
-            self.sessions = {}
-            self.history = {}
-            self.lock = threading.Lock()
+            self.psu = PSUI;self.key = key;self.rHost = rHost;self.rPort = rPort;self.sessions = {};self.history = {};self.lock = threading.Lock()
             self.psu.customLogPipe(f"Initialized `tunnelServe` module, rHost: '{self.rHost}:{self.rPort}' / '{str(self.key)[:5]}...'.")
         def _encryptPayload(self,data):
             iv = os.urandom(16)
@@ -247,7 +203,7 @@ class pingSmugglerUpgraded:
                 self.psu.customLogPipe(eM)
                 raise Exception(eM)
     class recv:
-        def __init__(self,PSUI:callable,key:str,base:str=None,outputFile:str=None,outputCap:str=None):
+        def __init__(self, PSUI, key, base=None, outputFile=None, outputCap=None):
             self.psu = PSUI
             self.key = key
             self.base = base if base else os.getcwd()
@@ -256,45 +212,143 @@ class pingSmugglerUpgraded:
             self.pCount = 0
             self.processedPackets = set()
             self.dataCompiled = b''
-            self.psu.customLogPipe(f"Initialized `recv` module, base: '{str(self.base)}' / '{str(self.key)[:5]}...'")
-        def _decryptChunk(self,chunk):
+            self.stop_event = threading.Event()
+            self.sniffer_thread = None
+            self.lock = threading.Lock()
+            if not os.path.exists(self.base): os.makedirs(self.base, exist_ok=True)
+            self.psu.customLogPipe(f"Base directory: {self.base}")
+            if self.outputFile:
+                self.outputPath = os.path.join(self.base, self.outputFile)
+                self.psu.customLogPipe(f"Output file path: {self.outputPath}")
+                with open(self.outputPath, "wb") as f: f.write(b'')
+            if self.outputPCap:
+                self.pcapPath = os.path.join(self.base, self.outputPCap)
+                self.psu.customLogPipe(f"PCAP file path: {self.pcapPath}")
+        def _decryptChunk(self, encData):
             try:
-                iv = chunk[:16]
-                ciphertext = chunk[16:]
+                if not encData or len(encData) < 16:
+                    self.psu.customLogPipe(f"Encrypted data invalid: {len(encData) if encData else 0} bytes", level=0)
+                    return None
+                iv = encData[:16]
+                ciphertext = encData[16:]
+                self.psu.customLogPipe(f"Decrypting chunk: IV length={len(iv)}, Ciphertext length={len(ciphertext)}", level=0)
                 cipher = cryptCipher(cryptAlgo.AES(self.key), cryptModes.CBC(iv), backend=cryptDefaultBackend())
                 decryptor = cipher.decryptor()
-                decData = decryptor.update(ciphertext) + decryptor.finalize()
+                padded = decryptor.update(ciphertext) + decryptor.finalize()
                 unpadder = cryptPadding.PKCS7(128).unpadder()
-                unpData = unpadder.update(decData) + unpadder.finalize()
-                return unpData
+                data = unpadder.update(padded) + unpadder.finalize()
+                self.psu.customLogPipe(f"Successfully decrypted chunk: {len(data)} bytes", level=0)
+                return data
             except Exception as E:
-                self.psu.customLogPipe(f"Caught exception while attempting to decode chunk '{str(chunk)[:5]}...': {str(E)}.",level=3)
+                self.psu.customLogPipe(f"Decryption failed: {str(E)}", level=3, exc_info=True)
                 return None
-        def _processPackets(self,packet):
-            if packet.haslayer(scapyICMP):
-                icmpPacket = packet[scapyICMP]
-                icmpData = bytes(icmpPacket.payload)
-                if icmpData and icmpData not in self.processedPackets:
-                    self.processedPackets.add(icmpData)
-                    decData = self._decryptChunk(icmpData)
-                    if decData:
-                        self.pCount += 1
-                        self.psu.customLogPipe(f"Decrypted chunk ({self.pCount}): '{decData.decode('utf-8',errors='ignore')[:5]}...'")
-                        self.dataCompiled += decData
-                        if self.outputFile:
-                            outputPath = os.path.join(self.base,str(self.outputFile))
-                            with open(outputPath,"ab") as f: f.write(decData)
-                        if self.outputPCap: scapyWRPcap(self.outputPCap, packet, append=True)
-        def start(self):
+        def _extractICMPPayload(self, packet):
             try:
-                scapySniff(filter="icmp",prn=self._processPackets)
-            except KeyboardInterrupt:
-                self.psu.customLogPipe("Caught `KeyboardInterrupt`.")
+                if not packet.haslayer(scapyICMP):
+                    return None
+                icmp_layer = packet[scapyICMP]
+                if icmp_layer.payload is None or len(icmp_layer.payload) == 0:
+                    self.psu.customLogPipe(f"ICMP payload is empty", level=0)
+                    return None
+                payload_data = bytes(icmp_layer.payload)
+                self.psu.customLogPipe(f"Extracted ICMP payload: {len(payload_data)} bytes", level=0)
+                return payload_data
             except Exception as E:
-                self.psu.customLogPipe(f"Caught exception while attempting to capture packets: '{str(E)}'.",level=3)
+                self.psu.customLogPipe(f"Failed to extract ICMP payload: {str(E)}", level=3, exc_info=True)
+                return None
+        def _processPackets(self, packet):
+            if self.stop_event.is_set(): return
+            with self.lock:
+                try:
+                    if not packet.haslayer(scapyICMP):
+                        return
+                    src_ip = packet[scapyIP].src if packet.haslayer(scapyIP) else 'unknown'
+                    self.psu.customLogPipe(f"Received ICMP packet from {src_ip}", level=1)
+                    icmpData = self._extractICMPPayload(packet)
+                    if not icmpData:
+                        self.psu.customLogPipe(f"No valid payload extracted", level=3)
+                        return
+                    if icmpData not in self.processedPackets:
+                        self.processedPackets.add(icmpData)
+                        decData = self._decryptChunk(icmpData)
+                        if decData:
+                            self.pCount += 1
+                            self.psu.customLogPipe(f"Decrypted chunk ({self.pCount}): {len(decData)} bytes", level=1)
+                            self.dataCompiled += decData
+                            if self.outputFile:
+                                try:
+                                    with open(self.outputPath, "ab") as f:
+                                        f.write(decData)
+                                        f.flush()
+                                    self.psu.customLogPipe(f"Wrote {len(decData)} bytes to {self.outputPath}", level=0)
+                                except Exception as E:
+                                    self.psu.customLogPipe(f"Failed to write to file: {str(E)}", level=3, exc_info=True)
+                            if self.outputPCap:
+                                try:
+                                    scapyWRPcap(self.pcapPath, packet, append=True)
+                                    self.psu.customLogPipe(f"Saved packet to PCAP", level=0)
+                                except Exception as E:
+                                    self.psu.customLogPipe(f"Failed to save PCAP: {str(E)}", level=3)
+                        else:
+                            self.psu.customLogPipe(f"Decryption returned None for packet", level=3)
+                    else:
+                        self.psu.customLogPipe(f"Duplicate packet detected, skipping", level=0)
+                except Exception as E:
+                    self.psu.customLogPipe(f"Error processing packet: {str(E)}", level=3, exc_info=True)
+        def _sniff_worker(self, timeout=None, count=0):
+            try:
+                self.psu.customLogPipe(f"Sniffer thread started", level=1)
+                if timeout is None:
+                    timeout = 0
+                start_time = time.time()
+                packets_captured = 0
+                while not self.stop_event.is_set():
+                    if timeout > 0 and (time.time() - start_time) >= timeout:
+                        self.psu.customLogPipe(f"Capture timeout reached", level=1)
+                        break
+                    if count > 0 and packets_captured >= count:
+                        self.psu.customLogPipe(f"Capture count reached: {packets_captured}/{count}", level=1)
+                        break
+                    try:
+                        packets = scapySniff(filter="icmp", prn=self._processPackets, timeout=1, count=0, store=True)
+                        packets_captured += len(packets)
+                    except KeyboardInterrupt:
+                        self.stop_event.set()
+                        break
+                    except Exception as E:
+                        if not self.stop_event.is_set():
+                            self.psu.customLogPipe(f"Sniff iteration error: {str(E)}", level=2)
+            except Exception as E:
+                self.psu.customLogPipe(f"Sniffer worker error: {str(E)}", level=3, exc_info=True)
             finally:
-                self.psu.customLogPipe(f"Finalized and received {self.pCount} packets.")
-            return (self.pCount,self.processedPackets,self.dataCompiled)
+                self.stop_event.set()
+                self.psu.customLogPipe(f"Sniffer thread stopped", level=1)
+        def start(self, timeout=10, count=0):
+            self.psu.customLogPipe(f"Starting packet capture (timeout={timeout}, count={count})", level=1)
+            self.stop_event.clear()
+            self.sniffer_thread = threading.Thread(target=self._sniff_worker, args=(timeout, count), daemon=False)
+            self.sniffer_thread.start()
+            try:
+                while self.sniffer_thread.is_alive():
+                    self.sniffer_thread.join(timeout=0.5)
+            except KeyboardInterrupt:
+                self.psu.customLogPipe("Caught `KeyboardInterrupt`.", level=1)
+                self.stop_event.set()
+                self.sniffer_thread.join(timeout=2)
+            finally:
+                self.stop_event.set()
+                if self.sniffer_thread.is_alive():
+                    self.sniffer_thread.join(timeout=1)
+                self.psu.customLogPipe(f"Finalized and received {self.pCount} packets.", level=1)
+                if self.dataCompiled:
+                    try:
+                        decoded_data = base64.b64decode(self.dataCompiled)
+                        self.psu.customLogPipe(f"Total data received: {len(self.dataCompiled)} bytes (encoded), {len(decoded_data)} bytes (decoded)", level=1)
+                    except Exception as E:
+                        self.psu.customLogPipe(f"Failed to base64 decode: {str(E)}", level=3)
+                else:
+                    self.psu.customLogPipe(f"No data received.", level=1)
+            return (self.pCount, self.processedPackets, self.dataCompiled)
     class send:
         def __init__(self,PSUI:callable,rHost:str,key:str,filePath:str=None,data:str|bytes=None,chunkSize:int=32,delay:int=0,randomSize:bool=False,icmpType:int=8):
             self.psu = PSUI
@@ -432,64 +486,76 @@ class pingSmugglerUpgraded:
                 self.customLogPipe("Error: Invalid key size. Key must be 16, 24, or 32 bytes long for AES.", level=3);sys.exit(1)
             if args.filePath and not os.path.isfile(args.filePath):
                 self.customLogPipe(f"Error: File '{args.filePath}' not found.", level=3);sys.exit(1)
-            sender = self.send(self, args.rHost, args.key.encode('utf-8'), filePath=args.filePath, data=args.dataStr, chunkSize=args.chunk_size, delay=args.delay, randomSize=args.random_size, icmpType=args.icmp_type);sender.start()
+            try:
+                key = bytes.fromhex(args.key)
+                if len(key) not in [16, 24, 32]:
+                    self.customLogPipe("Error: Invalid key size. Key must be 16, 24, or 32 bytes long for AES.", level=3);sys.exit(1)
+            except ValueError:
+                self.customLogPipe("Error: Key must be a valid hex string.", level=3);sys.exit(1)
+            sender = self.send(self, args.rHost, key, filePath=args.filePath, data=args.dataStr, chunkSize=args.chunk_size, delay=args.delay, randomSize=args.random_size, icmpType=args.icmp_type);sender.start()
         elif args.mode == 'recv':
             if len(args.key) not in [16, 24, 32]:
                 self.customLogPipe("Error: Invalid key size. Key must be 16, 24, or 32 bytes long for AES.", level=3);sys.exit(1)
             if not os.path.exists(args.base):
                 os.makedirs(args.base, exist_ok=True)
-            receiver = self.recv(self, args.key.encode('utf-8'), base=args.base, outputFile=args.outputFile, outputCap=args.pcapOutput);receiver.start()
+            try:
+                key = bytes.fromhex(args.key)
+                if len(key) not in [16, 24, 32]:
+                    self.customLogPipe("Error: Invalid key size. Key must be 16, 24, or 32 bytes long for AES.", level=3);sys.exit(1)
+            except ValueError:
+                self.customLogPipe("Error: Key must be a valid hex string.", level=3);sys.exit(1)
+            receiver = self.recv(self, key, base=args.base, outputFile=args.outputFile, outputCap=args.pcapOutput);receiver.start(timeout=30)
         elif args.mode == 'listen':
             if len(args.key) not in [16, 24, 32]:
                 self.customLogPipe("Error: Invalid key size. Key must be 16, 24, or 32 bytes long for AES.", level=3);sys.exit(1)
-            server = self.tunnelServe(self, args.key.encode('utf-8'), args.rHost, args.rPort);server.start()
+            try:
+                key = bytes.fromhex(args.key)
+                if len(key) not in [16, 24, 32]:
+                    self.customLogPipe("Error: Invalid key size. Key must be 16, 24, or 32 bytes long for AES.", level=3);sys.exit(1)
+            except ValueError:
+                self.customLogPipe("Error: Key must be a valid hex string.", level=3);sys.exit(1)
+            server = self.tunnelServe(self, key, args.rHost, args.rPort);server.start()
         elif args.mode == 'connect':
             if len(args.key) not in [16, 24, 32]:
                 self.customLogPipe("Error: Invalid key size. Key must be 16, 24, or 32 bytes long for AES.", level=3);sys.exit(1)
-            client = self.tunnelClient(self, args.key.encode('utf-8'), args.rHost, args.rPort, args.lPort);client.start()
+            try:
+                key = bytes.fromhex(args.key)
+                if len(key) not in [16, 24, 32]:
+                    self.customLogPipe("Error: Invalid key size. Key must be 16, 24, or 32 bytes long for AES.", level=3);sys.exit(1)
+            except ValueError:
+                self.customLogPipe("Error: Key must be a valid hex string.", level=3);sys.exit(1)
+            client = self.tunnelClient(self, key, args.rHost, args.rPort, args.lPort);client.start()
         elif args.mode == 'key-gen':
             key = os.urandom(args.size)
             self.customLogPipe(f"Generated {args.size}-byte AES key: {key.hex()}", level='output')
             print(f"- AES-KEY({str(args.size)}): `{str(key.hex())}`")
             sys.exit(0)
-
-
-
 def raiseBanner():
-    
     banner = [
-        '*-- PSU (Ping Smuggler Upgraded ) --*', 
-        '=====================================', 
-        '╔SRC╗                        ╔DST╗═╗ ', 
-        '║▓▓▓║─AES─┐            ┌─AES─║▓▓▓║R║ ', 
-        '╚═══╝     │ ╔[TUNNEL]╗ │     ╚═══╝O║ ', 
-        '          ├╱║░▒▒▒▒▒░║╲├           O║ ', 
-        '       >>─╬─║▓CRYPT▓║─╬─>>        T║ ', 
-        '          ╲ ║░▒▒▒▒▒░║ ╱           ≛║ ', 
-        '           ╲╚═[SEC]═╝╱            ▓║ ', 
-        '             └─PASS─┘             ╚╝ ', 
+        '*-- PSU (Ping Smuggler Upgraded ) --*',
+        '=====================================',
+        '╔SRC╗                        ╔DST╗═╗ ',
+        '║▓▓▓║─AES─┐            ┌─AES─║▓▓▓║R║ ',
+        '╚═══╝     │ ╔[TUNNEL]╗ │     ╚═══╝O║ ',
+        '          ├╱║░▒▒▒▒▒░║╲├           O║ ',
+        '       >>─╬─║▓CRYPT▓║─╬─>>        T║ ',
+        '          ╲ ║░▒▒▒▒▒░║ ╱           ≛║ ',
+        '           ╲╚═[SEC]═╝╱            ▓║ ',
+        '             └─PASS─┘             ╚╝ ',
         '======================================',
         f"{colorama.Fore.CYAN}Author: {colorama.Fore.LIGHTYELLOW_EX}J4ck3LSyN{colorama.Fore.RESET}",
         f"{colorama.Fore.CYAN}Credit: {colorama.Fore.LIGHTYELLOW_EX}0x7sec{colorama.Fore.RESET}",
         "======================================"
     ];banner = "\n".join(banner)
-    for i in [
-        "AES", "TUNNEL", "CRYPT",
-        "SEC","PASS","DST","SRC"]:
+    for i in ["AES", "TUNNEL", "CRYPT","SEC","PASS","DST","SRC"]:
         banner = banner.replace(i,f"{colorama.Fore.RED}{i}{colorama.Fore.RESET}")
-
     for i in ["R║","O║","T║"]:
         banner = banner.replace(i,f"{colorama.Fore.LIGHTMAGENTA_EX}{i[0]}{colorama.Fore.RESET}║")
-    
     for i in ['▒','░']: banner = banner.replace(i,f"{colorama.Style.DIM}{colorama.Fore.BLUE}{i}{colorama.Style.RESET_ALL}")
-
     for i in ['▓','▓']: banner = banner.replace(i,f"{colorama.Style.DIM}{colorama.Fore.MAGENTA}{i}{colorama.Style.RESET_ALL}")
-    
     print(str(banner))
-
 if __name__ == "__main__":
     colorama.init()
     raiseBanner()
     psu = pingSmugglerUpgraded(app=True)
     psu.run()
-
