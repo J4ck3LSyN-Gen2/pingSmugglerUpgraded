@@ -3,6 +3,8 @@ import argparse, os, sys, base64
 import time, random, socket, threading
 import struct, logging, traceback, getpass
 import colorama  # type: ignore
+__author__  = "J4ck3LSyN"
+__version__ = "0.1.0"
 class psuLoggingFormatter(logging.Formatter):
     # "\x1b[1m"+"\x1b[38m"
     black = "\x1b[30m";red = "\x1b[31m";green = "\x1b[32m";yellow = "\x1b[33m"
@@ -442,3 +444,4 @@ if __name__ == "__main__":
     raiseBanner()
     psu = pingSmugglerUpgraded(app=True)
     psu.run()
+
